@@ -3,7 +3,7 @@ Customer Purchase Prediction
 1.Guidance:
 To run the code: 
 
-1. Download data file in:   Password:
+1. Download data file in: https://pan.baidu.com/s/14uH_aHuNJ0hS6REr7jYuqQ   Password: u3vv
 
 (Data set is provided by JD from https://jdata.jd.com/html/detail.html?id=8 which is already not available from this source)
 

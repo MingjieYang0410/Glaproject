@@ -1,6 +1,17 @@
 Customer Purchase Prediction
 
-1.guidance:
+1.Guidance:
+To run the code: 
+
+1. Download data file in:   Password:
+(Data set is provided by JD from https://jdata.jd.com/html/detail.html?id=8 which is already not available from this source)
+
+2. Create new file ./ddata and put data file in it. 
+
+3. Create an empty file ./ddata/start_data.
+
+4. Run get_feature.py -> train.py
+
 
 Our implementation for DIN, DIEN, Base Model and Logistic Regression are in ./model.py and ./modules.py
 

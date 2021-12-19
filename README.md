@@ -4,6 +4,7 @@ Customer Purchase Prediction
 To run the code: 
 
 1. Download data file in:   Password:
+
 (Data set is provided by JD from https://jdata.jd.com/html/detail.html?id=8 which is already not available from this source)
 
 2. Create new file ./ddata and put data file in it. 

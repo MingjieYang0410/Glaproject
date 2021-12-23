@@ -1,11 +1,3 @@
-"""
-Created on Oct 26, 2020
-
-modules of DIN: attention mechanism
-
-@author: Ziyao Geng
-"""
-
 
 import tensorflow as tf
 from tensorflow.keras.regularizers import l2

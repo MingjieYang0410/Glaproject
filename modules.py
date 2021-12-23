@@ -58,7 +58,8 @@ class MyAttention(Layer):
         super(MyAttention, self).__init__()
         self.att_dense = [Dense(unit, activation=activation) for unit in att_hidden_units]
         self.att_final_dense = Dense(1, activation=None)
-        self.dense_q = Dense(120, activation=activation)
+        self.dense_q1 = Dense(60, activation=activation)
+        self.dense_q2 = Dense(120, activation=activation)
 
     def call(self, inputs):
         # query: candidate item  (None, d * 2), d is the dimension of embedding
@@ -66,7 +67,8 @@ class MyAttention(Layer):
         # value: hist items  (None, seq_len, d * 2)
         # mask: (None, seq_len)
         q, k, v, mask, activation_values = inputs
-        q = self.dense_q(q)
+        q = self.dense_q1(q)
+        q = self.dense_q2(q)
         q = tf.tile(q, multiples=[1, k.shape[1]])  # (None, seq_len * d * 2)
         q = tf.reshape(q, shape=[-1, k.shape[1], k.shape[2]])  # (None, seq_len, d * 2)
         # 相当于复制很多份， 使得可以并行计算

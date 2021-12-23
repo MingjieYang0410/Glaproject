@@ -1,10 +1,3 @@
-"""
-Created on May 23, 2020
-
-model: Deep interest network for click-through rate prediction
-
-@author: Ziyao Geng
-"""
 import tensorflow as tf
 
 from tensorflow.keras import Model
@@ -17,18 +10,7 @@ from modules import *
 class DIN(Model):
     def __init__(self, feature_columns, att_hidden_units,
                  ffn_hidden_units, att_activation='sigmoid', ffn_activation='prelu', maxlen = None, dnn_dropout=0.):
-        """
-        DIN
-        :param feature_columns: A list. dense_feature_columns + sparse_feature_columns
-        :param behavior_feature_list: A list. the list of behavior feature names
-        :param att_hidden_units: A tuple or list. Attention hidden units.
-        :param ffn_hidden_units: A tuple or list. Hidden units list of FFN.
-        :param att_activation: A String. The activation of attention.
-        :param ffn_activation: A String. Prelu or Dice.
-        :param maxlen: A scalar. Maximum sequence length.
-        :param dropout: A scalar. The number of Dropout.
-        :param embed_reg: A scalar. The regularizer of embedding.
-        """
+
         super(DIN, self).__init__()
         self.maxlen = maxlen
 
@@ -113,18 +95,7 @@ class DIN(Model):
 class DIEN(Model):
     def __init__(self, feature_columns, att_hidden_units=(80, 40),
                  ffn_hidden_units=(80, 40), att_activation='sigmoid', ffn_activation='prelu', maxlen=40, dnn_dropout=0., embed_dim=None):
-        """
-        DIN
-        :param feature_columns: A list. dense_feature_columns + sparse_feature_columns
-        :param behavior_feature_list: A list. the list of behavior feature names
-        :param att_hidden_units: A tuple or list. Attention hidden units.
-        :param ffn_hidden_units: A tuple or list. Hidden units list of FFN.
-        :param att_activation: A String. The activation of attention.
-        :param ffn_activation: A String. Prelu or Dice.
-        :param maxlen: A scalar. Maximum sequence length.
-        :param dropout: A scalar. The number of Dropout.
-        :param embed_reg: A scalar. The regularizer of embedding.
-        """
+
         super(DIEN, self).__init__()
         self.maxlen = maxlen
         self.embed_dim = embed_dim
@@ -249,18 +220,7 @@ class DIEN(Model):
 class BaseModel(Model):
     def __init__(self, feature_columns, att_hidden_units=(80, 40),
                  ffn_hidden_units=(80, 40), att_activation='prelu', ffn_activation='prelu', maxlen=40, dnn_dropout=0., embed_dim=None):
-        """
-        DIN
-        :param feature_columns: A list. dense_feature_columns + sparse_feature_columns
-        :param behavior_feature_list: A list. the list of behavior feature names
-        :param att_hidden_units: A tuple or list. Attention hidden units.
-        :param ffn_hidden_units: A tuple or list. Hidden units list of FFN.
-        :param att_activation: A String. The activation of attention.
-        :param ffn_activation: A String. Prelu or Dice.
-        :param maxlen: A scalar. Maximum sequence length.
-        :param dropout: A scalar. The number of Dropout.
-        :param embed_reg: A scalar. The regularizer of embedding.
-        """
+
         super(BaseModel, self).__init__()
         self.maxlen = maxlen
         self.embed_dim = embed_dim
@@ -339,18 +299,7 @@ class BaseModel(Model):
 class LR(Model):
     def __init__(self, feature_columns, att_hidden_units=(80, 40),
                  ffn_hidden_units=(80, 40), att_activation='prelu', ffn_activation='prelu', maxlen=40, dnn_dropout=0., embed_dim=None):
-        """
-        DIN
-        :param feature_columns: A list. dense_feature_columns + sparse_feature_columns
-        :param behavior_feature_list: A list. the list of behavior feature names
-        :param att_hidden_units: A tuple or list. Attention hidden units.
-        :param ffn_hidden_units: A tuple or list. Hidden units list of FFN.
-        :param att_activation: A String. The activation of attention.
-        :param ffn_activation: A String. Prelu or Dice.
-        :param maxlen: A scalar. Maximum sequence length.
-        :param dropout: A scalar. The number of Dropout.
-        :param embed_reg: A scalar. The regularizer of embedding.
-        """
+
         super(LR, self).__init__()
         self.maxlen = maxlen
         self.embed_dim = embed_dim
@@ -421,18 +370,7 @@ class LR(Model):
 class MyModel(Model):
     def __init__(self, feature_columns, att_hidden_units=(80, 40),
                  ffn_hidden_units=(80, 40), att_activation='sigmoid', ffn_activation='prelu', maxlen=40, dnn_dropout=0., embed_dim=None):
-        """
-        DIN
-        :param feature_columns: A list. dense_feature_columns + sparse_feature_columns
-        :param behavior_feature_list: A list. the list of behavior feature names
-        :param att_hidden_units: A tuple or list. Attention hidden units.
-        :param ffn_hidden_units: A tuple or list. Hidden units list of FFN.
-        :param att_activation: A String. The activation of attention.
-        :param ffn_activation: A String. Prelu or Dice.
-        :param maxlen: A scalar. Maximum sequence length.
-        :param dropout: A scalar. The number of Dropout.
-        :param embed_reg: A scalar. The regularizer of embedding.
-        """
+
         super(MyModel, self).__init__()
         self.maxlen = maxlen
         self.embed_dim = embed_dim
@@ -468,7 +406,7 @@ class MyModel(Model):
         # attention layer
         self.attention_layer = MyAttention(att_hidden_units, att_activation)
 
-        self.hist_gru = LSTM(120)
+        self.hist_gru = GRU(120, return_sequences=True)
         self.bn = BatchNormalization(trainable=True)
         # ffn
         if ffn_activation != 'prelu':
@@ -502,11 +440,13 @@ class MyModel(Model):
 
         # user_info : (None, embed_dim * 2)
         activation_val = []
-        user_info = self.attention_layer([target_embed_seq, seq_embed, seq_embed, mask_value, activation_val])
-        gru_embed = self.hist_gru(user_info, mask=mask_bool)
+        gru_embed = self.hist_gru(seq_embed, mask=mask_bool)
+
+        user_info = self.attention_layer([target_embed_seq, gru_embed, gru_embed, mask_value, activation_val])
+
         # concat user_info(att hist), cadidate item embedding, other features
 
-        info_all = tf.concat([gru_embed, target_embed_seq, target_embed_side, user_side], axis=-1)
+        info_all = tf.concat([user_info, target_embed_seq, target_embed_side, user_side], axis=-1)
 
         info_all = self.bn(info_all)
 

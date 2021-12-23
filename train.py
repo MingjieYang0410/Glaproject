@@ -38,7 +38,7 @@ ffn_activation = 'prelu' #prelu
 train_batch_size = 128  # 128
 test_val_batch_size = 2048
 learning_rate = 0.001
-l2_weight = 0.001
+l2_weight = 0
 weight_auxiliary = 0
 # ========================== Create dataset =======================
 if mode == 'learning_curve':
@@ -66,11 +66,11 @@ val_loss_alluxiry = tf.keras.metrics.Mean('vall_loss_auxiliry', dtype=tf.float32
 # ==================================================================
 optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
 if mode == 'normal':
-    model = DIN(feature_columns, att_hidden_units, ffn_hidden_units, att_activation,ffn_activation, maxlen, dnn_dropout)
+#    model = DIN(feature_columns, att_hidden_units, ffn_hidden_units, att_activation,ffn_activation, maxlen, dnn_dropout)
 #    model = DIEN(feature_columns, att_hidden_units, ffn_hidden_units, att_activation,ffn_activation, maxlen, dnn_dropout,  embed_dim=embed_dim)
 #    model = BaseModel(feature_columns, att_hidden_units, ffn_hidden_units, att_activation,ffn_activation, maxlen, dnn_dropout,  embed_dim=embed_dim)
 #    model = LR(feature_columns, att_hidden_units, ffn_hidden_units, att_activation,ffn_activation, maxlen, dnn_dropout,  embed_dim=embed_dim)
-#    model = MyModel(feature_columns, att_hidden_units, ffn_hidden_units, att_activation,ffn_activation, maxlen, dnn_dropout,  embed_dim=embed_dim)
+    model = MyModel(feature_columns, att_hidden_units, ffn_hidden_units, att_activation,ffn_activation, maxlen, dnn_dropout,  embed_dim=embed_dim)
     model_name = "MyModel"
 
 def evaluate(dev_data_all):

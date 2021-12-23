@@ -49,6 +49,8 @@ class Attention_Layer(Layer):
         outputs = tf.matmul(outputs, v)  # (None, 1, d * 2) # 正式计算得分
         outputs = tf.squeeze(outputs, axis=1)  # (None, d * 2)
         return outputs
+
+
 class MyAttention(Layer):
     def __init__(self, att_hidden_units, activation='prelu'):
         """
@@ -56,6 +58,7 @@ class MyAttention(Layer):
         super(MyAttention, self).__init__()
         self.att_dense = [Dense(unit, activation=activation) for unit in att_hidden_units]
         self.att_final_dense = Dense(1, activation=None)
+        self.dense_q = Dense(120, activation=activation)
 
     def call(self, inputs):
         # query: candidate item  (None, d * 2), d is the dimension of embedding
@@ -63,6 +66,7 @@ class MyAttention(Layer):
         # value: hist items  (None, seq_len, d * 2)
         # mask: (None, seq_len)
         q, k, v, mask, activation_values = inputs
+        q = self.dense_q(q)
         q = tf.tile(q, multiples=[1, k.shape[1]])  # (None, seq_len * d * 2)
         q = tf.reshape(q, shape=[-1, k.shape[1], k.shape[2]])  # (None, seq_len, d * 2)
         # 相当于复制很多份， 使得可以并行计算
@@ -81,13 +85,10 @@ class MyAttention(Layer):
         paddings = tf.zeros_like(outputs)
         outputs = tf.where(tf.equal(mask, 0), paddings, outputs)  # (None, seq_len)
         activation_values.append(outputs)
- #       outputs = tf.expand_dims(outputs, axis=1)  # None, 1, seq_len)
-####################################
-        outputs = tf.expand_dims(outputs, axis=-1)  # None, 1, seq_len)
-        outputs = outputs * v
-####################################
-        #        outputs = tf.matmul(outputs, v)  # (None, 1, d * 2) # 正式计算得分
-#        outputs = tf.squeeze(outputs, axis=1)  # (None, d * 2)
+        outputs = tf.expand_dims(outputs, axis=1)  # None, 1, seq_len)
+
+        outputs = tf.matmul(outputs, v)  # (None, 1, d * 2) # 正式计算得分
+        outputs = tf.squeeze(outputs, axis=1)  # (None, d * 2)
         return outputs
 
 
